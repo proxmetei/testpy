@@ -60,7 +60,7 @@ class LSTMAgent:
             # Теперь НЕ передаём коммуникацию
             logits, _, (hx, cx) = self.policy(obs_tensor, self.hx, self.cx, None)
             probs = F.softmax(logits, dim=-1)
-            action = probs.argmax().item()
+            action = torch.multinomial(probs, num_samples=1).item()
 
             # Сохраняем внутреннее состояние LSTM
             self.hx, self.cx = hx, cx

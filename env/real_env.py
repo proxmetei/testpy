@@ -100,7 +100,7 @@ class DeliveryMultiAgentEnv:
                 #print(f"✅ Агент {i} собрал ресурс!")
                 self.collected_resources.append(new_pos)
                 self.has_resource[i] = True
-                reward += 100
+                reward += 500
 
             # Доставил ли агент ресурс к цели?
             if self.has_resource[i] and new_pos in self.goal_positions:
@@ -115,6 +115,15 @@ class DeliveryMultiAgentEnv:
                     done = True
                 else:
                     reward -= 1.0  # штраф за попытку использовать занятую цель
+
+            if not self.has_resource[i]:
+                min_dist_before = np.min(
+                    [np.linalg.norm(self.agents_pos[i] - np.array(p)) for p in self.resource_positions if
+                     p not in self.collected_resources])
+                min_dist_after = np.min([np.linalg.norm(self.agents_pos[i] + np.array([dx, dy]) - np.array(p)) for p in
+                                         self.resource_positions if p not in self.collected_resources])
+                delta = min_dist_before - min_dist_after
+                reward += delta * 5
 
             rewards[i] = reward
             dones[i] = done
